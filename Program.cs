@@ -10,6 +10,8 @@ namespace ToDoList
     {
         static void Main(string[] args)
         {
+            var app = new Tasks("Main tasks");
+            app.Run();
         }
     }
 }
