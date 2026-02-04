@@ -16,14 +16,19 @@ namespace ToDoList
 
         public void Run()
         {
-            //Console.WriteLine("Not implemented yet.\nPress any key to close...");
-            //Console.ReadKey();
             while (true)
             {
+                Console.Clear();
                 Console.WriteLine($"=== {tableName} ===");
-                for (int i = 0; i < tasks.Count; i++)
+                if (tasks.Count < 1) 
                 {
-                    Console.WriteLine($"{i + 1}. {tasks[i]}");
+                    Console.WriteLine("No tasks, add one)");
+                } else
+                {
+                    for (int i = 0; i < tasks.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {tasks[i]}");
+                    }
                 }
                 Console.WriteLine($"=== {tableName} ===");
                 Console.WriteLine();
@@ -60,18 +65,31 @@ namespace ToDoList
 
         private void AddTask()
         {
-            Console.WriteLine("Not Impemented yet. Press any key...");
-            Console.ReadKey();
+            Console.Write("Enter task name: ");
+            string name = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(name))
+            {
+                Console.WriteLine("Task name is not correct - " + name);
+            }
+            else 
+            {
+                tasks.Add(name);
+            }
         }
         private void RemoveTask()
         {
-            Console.WriteLine("Not Impemented yet. Press any key...");
-            Console.ReadKey();
+            Console.Write("Enter task number u want to remove: ");
+            int taskNum = int.Parse(Console.ReadLine());
+
+            tasks.RemoveAt(taskNum - 1);
         }
         private void MarkTask()
         {
-            Console.WriteLine("Not Impemented yet. Press any key...");
-            Console.ReadKey();
+            Console.Write("Enter task number u have done: ");
+            int taskNum = int.Parse(Console.ReadLine());
+
+            tasks[taskNum - 1] = tasks[taskNum - 1] + "(done!)";
         }
     }
 }
