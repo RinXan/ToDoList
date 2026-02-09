@@ -13,6 +13,11 @@ namespace ToDoList
             Title = title;
             isDone = false;
         }
+        public Task(string title, bool status) 
+        {
+            Title = title;
+            isDone = status;
+        }
 
         public void ChangeStatus()
         {
