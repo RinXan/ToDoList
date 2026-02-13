@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ToDoList
+﻿namespace ToDoList
 {
     public class Task
     {
         public string Title { get; set; }
-        public bool isDone { get; protected set; }
+        public bool isDone { get; set; }
 
         public Task(string title) 
         {
@@ -18,12 +15,6 @@ namespace ToDoList
             Title = title;
             isDone = status;
         }
-
-        public void ChangeStatus()
-        {
-            isDone = !isDone;
-        }
-    
         public override string ToString()
         {
             string status = isDone ? "[+]" : "[ ]";
