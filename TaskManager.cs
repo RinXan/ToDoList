@@ -29,7 +29,7 @@ namespace ToDoList
         }
         public void ChangeTitle(Task task, string newTitle)
         {
-            task.Title = newTitle;
+            task.ChangeTitle(newTitle);
         }
         public List<Task> GetAllTasks()
         {
