@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ToDoList.Exceptions;
 
 namespace ToDoList
 {
@@ -21,14 +22,17 @@ namespace ToDoList
         }
         public void RemoveTask(Task task)
         {
+            if (task == null || !tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
             tasks.Remove(task);
         }
         public void ChangeStatus(Task task)
         {
+            if (task == null || !tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
             task.isDone = !task.isDone;
         }
         public void ChangeTitle(Task task, string newTitle)
         {
+            if (task == null || !tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
             task.ChangeTitle(newTitle);
         }
         public List<Task> GetAllTasks()
@@ -42,6 +46,12 @@ namespace ToDoList
         public int GetComplitedTaskCount()
         {
             return tasks.Count(t =>  t.isDone);
+        }
+
+        public Task GetTaskByIndex(int number)
+        {
+            if (number < 1 || number > tasks.Count) throw new TaskNotFoundException(number);
+            return tasks[number - 1];
         }
     }
 }

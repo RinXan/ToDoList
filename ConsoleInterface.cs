@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Threading.Tasks;
+using ToDoList.Exceptions;
 
 namespace ToDoList
 {
@@ -20,43 +21,60 @@ namespace ToDoList
         {
             while (true)
             {
-                Console.Clear();
-                Console.WriteLine("*** Task manager ***");
-                Console.WriteLine($"Total tasks count: {_taskManager.GetTotalTaskCount()} (Done: {_taskManager.GetComplitedTaskCount()})\n");
-                Console.WriteLine("1. Show all tasks");
-                Console.WriteLine("2. Add task");
-                Console.WriteLine("3. Delete task");
-                Console.WriteLine("4. Change task status");
-                Console.WriteLine("5. Change task title");
-                Console.WriteLine("6. Exit");
-                Console.Write("\nChoice: ");
+                try
+                {   
+                    Console.Clear();
+                    Console.WriteLine("*** Task manager ***");
+                    Console.WriteLine($"Total tasks count: {_taskManager.GetTotalTaskCount()} (Done: {_taskManager.GetComplitedTaskCount()})\n");
+                    Console.WriteLine("1. Show all tasks");
+                    Console.WriteLine("2. Add task");
+                    Console.WriteLine("3. Delete task");
+                    Console.WriteLine("4. Change task status");
+                    Console.WriteLine("5. Change task title");
+                    Console.WriteLine("6. Exit");
+                    Console.Write("\nChoice: ");
 
-                int choice = int.Parse(Console.ReadLine());
+                    int choice = int.Parse(Console.ReadLine());
 
-                switch (choice)
-                {
-                    case 1:
-                        ShowAllTasks();
-                        break;
-                    case 2:
-                        AddTask();
-                        break;
-                    case 3:
-                        DeleteTask();
-                        break;
-                    case 4:
-                        ChangeStatus();
-                        break;
-                    case 5:
-                        ChangeTitle();
-                        break;
-                    case 6:
-                        return;
-                    default:
-                        Console.WriteLine("\nIncorrect option\nPress any key to try again...");
-                        Console.ReadKey();
-                        break;
+                    switch (choice)
+                    {
+                        case 1:
+                            ShowAllTasks();
+                            break;
+                        case 2:
+                            AddTask();
+                            break;
+                        case 3:
+                            DeleteTask();
+                            break;
+                        case 4:
+                            ChangeStatus();
+                            break;
+                        case 5:
+                            ChangeTitle();
+                            break;
+                        case 6:
+                            return;
+                        default:
+                            Console.WriteLine("\nIncorrect option\nPress any key to try again...");
+                            Console.ReadKey();
+                            break;
+                    }
                 }
+                catch (ToDoListException ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(ex.Message);
+                    Console.ResetColor();
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(ex.Message);
+                    Console.ResetColor();
+                }
+                Console.WriteLine("\nPress any key...");
+                Console.ReadKey();
             }
         }
 
@@ -69,17 +87,15 @@ namespace ToDoList
         {
             Console.Write("\nEnter number: ");
 
-            int number = int.Parse(Console.ReadLine());
-            List<Task> tasks = _taskManager.GetAllTasks();
-
+            if (!int.TryParse(Console.ReadLine(), out int number))
+            {
+                throw new InvalidTaskDataException("Invalid number format");
+            }
             if (number < 1 || number > _taskManager.GetTotalTaskCount())
             {
-                return null;
+                throw new TaskNotFoundException($"Task number {number} does not exist");
             }
-            else
-            {
-                return tasks[number - 1];
-            }
+            return _taskManager.GetTaskByIndex(number);
         }
         private (string, bool) parse(string line)
         {
@@ -108,9 +124,6 @@ namespace ToDoList
                     i++;
                 }
             }
-
-            Console.WriteLine("\nPress any key...");
-            Console.ReadKey();
         }
         private void AddTask()
         {
@@ -120,20 +133,10 @@ namespace ToDoList
 
             string title = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                Console.WriteLine($"Task title is empty. Title: {title}");
-            }
-            else
-            {
-                _taskManager.AddTask(title);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Task: {title} added!");
-                Console.ResetColor();
-            }
-
-            Console.WriteLine("\nPress any key...");
-            Console.ReadKey();
+            _taskManager.AddTask(title);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Task: {title} added!");
+            Console.ResetColor();
         }
         private void DeleteTask()
         {
@@ -142,19 +145,11 @@ namespace ToDoList
 
             Task task = FindTask();
 
-            if (task == null)
-            {
-                Console.WriteLine($"Task is not exist");
-            }
-            else
-            {
-                _taskManager.RemoveTask(task);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Task deleted!");
-                Console.ResetColor();
-            }
-            Console.WriteLine("\nPress any key...");
-            Console.ReadKey();
+            _taskManager.RemoveTask(task);
+         
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Task deleted!");
+            Console.ResetColor();
         }
         private void ChangeStatus()
         {
@@ -163,19 +158,10 @@ namespace ToDoList
 
             Task task = FindTask();
 
-            if (task == null)
-            {
-                Console.WriteLine($"Task is not exist");
-            }
-            else
-            {
-                _taskManager.ChangeStatus(task);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Task status changed!");
-                Console.ResetColor();
-            }
-            Console.WriteLine("\nPress any key...");
-            Console.ReadKey();
+            _taskManager.ChangeStatus(task);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Task status changed!");
+            Console.ResetColor();
         }
         private void ChangeTitle()
         {
@@ -184,24 +170,15 @@ namespace ToDoList
 
             Task task = FindTask();
 
-            if (task == null)
-            {
-                Console.WriteLine($"Task is not exist");
-            }
-            else
-            {
-                Console.WriteLine($"Current title: {task.Title}");
-                Console.Write("Enter new title: ");
-                string title = Console.ReadLine();
+            Console.WriteLine($"Current title: {task.Title}");
+            Console.Write("Enter new title: ");
+            string title = Console.ReadLine();
 
-                _taskManager.ChangeTitle(task, title);
+            _taskManager.ChangeTitle(task, title);
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Task title changed!");
-                Console.ResetColor();
-            }
-            Console.WriteLine("\nPress any key...");
-            Console.ReadKey();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Task title changed!");
+            Console.ResetColor();
         }
         private List<Task> LoadTasks(string filePath)
         {

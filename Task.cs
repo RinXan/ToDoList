@@ -10,13 +10,13 @@ namespace ToDoList
         public Task(string title) 
         {
             ValidateTitle(title);
-            Title = title;
+            Title = title.Trim();
             isDone = false;
         }
         public Task(string title, bool status) 
         {
             ValidateTitle(title);
-            Title = title;
+            Title = title.Trim();
             isDone = status;
         }
 
