@@ -11,12 +11,10 @@ namespace ToDoList
     public class ConsoleInterface
     {
         private TaskManager _taskManager;
-
         public ConsoleInterface(TaskManager taskManager) 
         {
             _taskManager = taskManager;
         }
-
         public void ShowMenu()
         {
             while (true)
@@ -77,12 +75,6 @@ namespace ToDoList
                 Console.ReadKey();
             }
         }
-
-        private void NotImplementedYet()
-        {
-            Console.WriteLine("\nNot implemented yet.\nPress any key...");
-            Console.ReadKey();
-        }
         private Task FindTask()
         {
             Console.Write("\nEnter number: ");
@@ -96,13 +88,6 @@ namespace ToDoList
                 throw new TaskNotFoundException($"Task number {number} does not exist");
             }
             return _taskManager.GetTaskByIndex(number);
-        }
-        private (string, bool) parse(string line)
-        {
-            string title = line.Split(';')[0];
-            bool status = bool.Parse(line.Split(';')[1]);
-
-            return (title, status);
         }
         private void ShowAllTasks()
         {
@@ -179,18 +164,6 @@ namespace ToDoList
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Task title changed!");
             Console.ResetColor();
-        }
-        private List<Task> LoadTasks(string filePath)
-        {
-            List<Task> tasks = new List<Task>();
-
-            foreach (string line in File.ReadAllLines(filePath))
-            {
-                (string title, bool status) task = parse(line);
-                tasks.Add(new Task(task.title, task.status));
-            }
-
-            return tasks;
         }
     }
 }
