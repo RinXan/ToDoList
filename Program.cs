@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoList.Exceptions;
+using ToDoList.Infrastructure;
+using ToDoList.Logger;
 
 namespace ToDoList
 {
@@ -13,19 +15,22 @@ namespace ToDoList
         static void Main(string[] args)
         {
             string filePath = "data.json";
+            string logfilePath = "log.txt";
 
-            TaskManager taskManager = new TaskManager();
+            ILogger logger = new FileLogger(logfilePath);
 
-            LoadData(taskManager, filePath);
+            TaskManager taskManager = new TaskManager(logger);
+
+            LoadData(taskManager, filePath, logger);
 
             ConsoleInterface consoleInterface = new ConsoleInterface(taskManager);
             
             consoleInterface.ShowMenu();
 
-            SaveData(taskManager, filePath);
+            SaveData(taskManager, filePath, logger);
         }
     
-        static void SaveData(TaskManager taskManager, string filePath)
+        static void SaveData(TaskManager taskManager, string filePath, ILogger logger)
         {
             try
             {
@@ -34,18 +39,19 @@ namespace ToDoList
             }
             catch (TaskOperationException ex)
             {
+                logger.Log(LogLevel.WARNING, ex.InnerException.Message);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"[WARNING] Saving tasks failed: {ex.Message}");
-                Console.ResetColor();
+                Console.WriteLine($"[WARNING] {ex.Message}");
             }
             catch (Exception ex)
             {
+                logger.Log(LogLevel.ERROR, ex.Message);
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Unexpected error: {ex.Message}");
-                Console.ResetColor();
+                Console.WriteLine("System error");
             }
+            Console.ResetColor();
         }
-        static void LoadData(TaskManager taskManager, string filePath)
+        static void LoadData(TaskManager taskManager, string filePath, ILogger logger)
         {
             try
             {
@@ -54,16 +60,17 @@ namespace ToDoList
             }
             catch (TaskOperationException ex)
             {
+                logger.Log(LogLevel.WARNING, ex.InnerException.Message);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"[WARNING] Loading tasks failed: {ex.Message}");
-                Console.ResetColor();
+                Console.WriteLine($"[WARNING] {ex.Message}");
             }
             catch (Exception ex)
             {
+                logger.Log(LogLevel.ERROR, ex.Message);
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Unexpected error: {ex.Message}");
-                Console.ResetColor();
+                Console.WriteLine("System error");
             }
+            Console.ResetColor();
         }
     }
 }

@@ -5,53 +5,60 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ToDoList.Exceptions;
+using ToDoList.Logger;
 
 namespace ToDoList
 {
     public class TaskManager
     {
-        private List<Task> tasks;
+        private List<Task> _tasks;
+        private readonly ILogger _logger;
 
-        public TaskManager() 
+        public TaskManager(ILogger logger) 
         {
-            tasks = new List<Task>();
+            _tasks = new List<Task>();
+            _logger = logger;
         }
     
         public void AddTask(string title)
         {
-            tasks.Add(new Task(title));
+            _tasks.Add(new Task(title));
+            _logger.Log(LogLevel.INFO, $"Task: {title} added");
         }
         public void RemoveTask(Task task)
         {
-            if (task == null || !tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
-            tasks.Remove(task);
+            if (task == null || !_tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
+            _tasks.Remove(task);
+            _logger.Log(LogLevel.INFO, $"Task: {task.Title} removed");
         }
         public void ChangeStatus(Task task)
         {
-            if (task == null || !tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
+            if (task == null || !_tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
             task.isDone = !task.isDone;
+            _logger.Log(LogLevel.INFO, $"Task: {task.Title} - status changed: {task.isDone}");
         }
         public void ChangeTitle(Task task, string newTitle)
         {
-            if (task == null || !tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
+            if (task == null || !_tasks.Contains(task)) throw new TaskNotFoundException("Task not found in the list");
             task.ChangeTitle(newTitle);
+            _logger.Log(LogLevel.INFO, $"Task title changed: {task.Title}");
         }
         public List<Task> GetAllTasks()
         {
-            return new List<Task>(tasks);
+            return new List<Task>(_tasks);
         }
         public int GetTotalTaskCount()
         {
-            return tasks.Count;
+            return _tasks.Count;
         }
         public int GetComplitedTaskCount()
         {
-            return tasks.Count(t =>  t.isDone);
+            return _tasks.Count(t =>  t.isDone);
         }
         public Task GetTaskByIndex(int number)
         {
-            if (number < 1 || number > tasks.Count) throw new TaskNotFoundException(number);
-            return tasks[number - 1];
+            if (number < 1 || number > _tasks.Count) throw new TaskNotFoundException(number);
+            return _tasks[number - 1];
         }
         // saving tasks in JSON file
         public void SaveToFile(string filePath)
@@ -60,8 +67,9 @@ namespace ToDoList
             try
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
-                string jsonedTasks = JsonSerializer.Serialize(tasks, options);
+                string jsonedTasks = JsonSerializer.Serialize(_tasks, options);
                 File.WriteAllText(filePath, jsonedTasks);
+                _logger.Log(LogLevel.INFO, $"{_tasks.Count} tasks saved to JSON file");
             }
             catch (Exception ex)
             {
@@ -77,12 +85,13 @@ namespace ToDoList
             {
                 if (!File.Exists(filePath))
                 {
-                    tasks.Clear();
+                    _tasks.Clear();
                     return;
                 }
 
                 string json = File.ReadAllText(filePath);
-                tasks = JsonSerializer.Deserialize<List<Task>>(json) ?? new List<Task>();
+                _tasks = JsonSerializer.Deserialize<List<Task>>(json) ?? new List<Task>();
+                _logger.Log(LogLevel.INFO, $"{_tasks.Count} tasks loaded from JSON file");
             }
             catch (Exception ex)
             {
@@ -98,7 +107,7 @@ namespace ToDoList
             {
                 using (StreamWriter writer = new StreamWriter(filePath))
                 {
-                    foreach (Task task in tasks)
+                    foreach (Task task in _tasks)
                     {
                         writer.WriteLine($"{task.Title};{task.isDone}");
                     }
@@ -119,7 +128,7 @@ namespace ToDoList
             {
                 if (!File.Exists(filePath))
                 {
-                    tasks.Clear();
+                    _tasks.Clear();
                     return;
                 }
 
@@ -139,7 +148,7 @@ namespace ToDoList
                     }
                 }
 
-                tasks = loadedTasks;
+                _tasks = loadedTasks;
             }
             catch (Exception ex)
             {
