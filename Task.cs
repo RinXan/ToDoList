@@ -1,12 +1,15 @@
-﻿using ToDoList.Exceptions;
+﻿using System.Text.Json.Serialization;
+using ToDoList.Exceptions;
 
 namespace ToDoList
 {
     public class Task
     {
-        public string Title { get; protected set; }
+        public string Title { get; set; }
         public bool isDone { get; set; }
 
+        [JsonConstructor]
+        private Task() { }
         public Task(string title) 
         {
             ValidateTitle(title);

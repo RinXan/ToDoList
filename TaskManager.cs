@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ToDoList.Exceptions;
 
@@ -53,7 +53,45 @@ namespace ToDoList
             if (number < 1 || number > tasks.Count) throw new TaskNotFoundException(number);
             return tasks[number - 1];
         }
-        public void SaveToFile(string filePath) 
+        // saving tasks in JSON file
+        public void SaveToFile(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("File path cannot be empty", nameof(filePath));
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonedTasks = JsonSerializer.Serialize(tasks, options);
+                File.WriteAllText(filePath, jsonedTasks);
+            }
+            catch (Exception ex)
+            {
+                throw new TaskOperationException("SaveToFile", "Failed to save tasks to json file", ex);
+            }
+        }
+        //loading tasks from JSON file
+        public void LoadFromFile(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("File path cannot be empty", nameof(filePath));
+
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    tasks.Clear();
+                    return;
+                }
+
+                string json = File.ReadAllText(filePath);
+                tasks = JsonSerializer.Deserialize<List<Task>>(json) ?? new List<Task>();
+            }
+            catch (Exception ex)
+            {
+                throw new TaskOperationException("LoadFromFile", "Failed to load tasks from json file", ex);
+            }
+        }
+
+        // saving tasks in text file function
+        /*public void SaveToFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("File path cannot be empty", nameof(filePath));
             try
@@ -70,8 +108,10 @@ namespace ToDoList
             {
                 throw new TaskOperationException("SaveToFile", "Failed to save tasks to file", ex);
             }
-        }
-        public void LoadFromFile(string filePath) 
+        }*/
+
+        // loading tasks from text file
+        /* public void LoadFromFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("File path cannot be empty", nameof(filePath));
 
@@ -86,7 +126,7 @@ namespace ToDoList
                 string[] lines = File.ReadAllLines(filePath);
                 List<Task> loadedTasks = new List<Task>();
 
-                foreach(string line in lines)
+                foreach (string line in lines)
                 {
                     string[] parts = line.Split(';');
                     if (parts.Length >= 2 && bool.TryParse(parts[1], out bool status))
@@ -105,6 +145,6 @@ namespace ToDoList
             {
                 throw new TaskOperationException("LoadFromFile", "Failed to load tasks from file", ex);
             }
-        }
+        } */
     }
 }

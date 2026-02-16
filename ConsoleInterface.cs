@@ -120,7 +120,7 @@ namespace ToDoList
 
             _taskManager.AddTask(title);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Task: {title} added!");
+            Console.WriteLine($"Task: {title.Trim()} added!");
             Console.ResetColor();
         }
         private void DeleteTask()

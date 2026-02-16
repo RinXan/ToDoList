@@ -12,7 +12,7 @@ namespace ToDoList
     {
         static void Main(string[] args)
         {
-            string filePath = "data.txt";
+            string filePath = "data.json";
 
             TaskManager taskManager = new TaskManager();
 
