@@ -35,4 +35,4 @@
 
 * Список задач
 
-![Tasks list](assets/all_tasks.PNG)
+![Tasks list](assets/tasks.png)
