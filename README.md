@@ -16,10 +16,10 @@
 
 ## Технологии и подходы
 
-Язык: C#
-Среда: .NET Console Application
-Сериализация: System.Text.Json (с форматированием для читаемости)
-Логирование: собственный интерфейс ILogger и реализация FileLogger
+- Язык: C#
+- Среда: .NET Console Application
+- Сериализация: System.Text.Json (с форматированием для читаемости)
+- Логирование: собственный интерфейс ILogger и реализация FileLogger
 
 Обработка ошибок: иерархия пользовательских исключений:
 * ToDoListException – базовый класс
@@ -31,8 +31,8 @@
 
 * Главное меню
 
-![Main menu](assets/main.png)
+![Main menu](assets/main.PNG)
 
 * Список задач
 
-![Tasks list](assets/all_tasks.png)
+![Tasks list](assets/all_tasks.PNG)
